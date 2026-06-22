@@ -1,14 +1,14 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useCartStore } from '@/store/cartStore';
 
-// Structure blueprint for our Saree objects
+export const dynamic = 'force-dynamic';
+
 interface Saree {
-  id: string;
+  id: any; // changed to any to handle both numbers and strings safely
   name: string;
   category: string;
   price: number;
@@ -18,23 +18,35 @@ interface Saree {
 export default function CollectionsPage() {
   const [sarees, setSarees] = useState<Saree[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debugError, setDebugError] = useState<string | null>(null);
   
-  // Connect the global "Add to Cart" capability
   const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
     async function fetchInventory() {
       try {
         setLoading(true);
-        // Query the live 'sarees' database table we built
+        setDebugError(null);
+        
+        // Fetch out of Supabase
         const { data, error } = await supabase
           .from('sarees')
           .select('*');
 
-        if (error) throw error;
-        if (data) setSarees(data);
-      } catch (err) {
+        if (error) {
+          setDebugError(`Supabase Error: ${error.message} (Code: ${error.code})`);
+          throw error;
+        }
+        
+        if (data) {
+          setSarees(data);
+          if (data.length === 0) {
+            setDebugError("Connected to Supabase successfully, but the 'sarees' table returned 0 rows. Check if your rows are saved under the public schema.");
+          }
+        }
+      } catch (err: any) {
         console.error('Error loading inventory:', err);
+        if (!debugError) setDebugError(`System Error: ${err.message || err}`);
       } finally {
         setLoading(false);
       }
@@ -55,7 +67,13 @@ export default function CollectionsPage() {
     <main className="min-h-screen bg-[#160205] pt-36 pb-24 px-6 md:px-12 text-white">
       <div className="max-w-7xl mx-auto">
         
-        {/* Page Titles */}
+        {/* DEBUG ERROR BANNER */}
+        {debugError && (
+          <div className="mb-8 p-4 bg-red-900/40 border border-red-500 text-red-200 rounded-xl text-xs font-mono max-w-2xl mx-auto text-center whitespace-pre-wrap">
+            ⚠️ Diagnostic Panel:<br/>{debugError}
+          </div>
+        )}
+
         <div className="text-center mb-16">
           <span className="text-[#d4a24c] text-xs font-semibold tracking-widest uppercase bg-[#d4a24c]/10 px-4 py-1.5 rounded-full border border-[#d4a24c]/20">
             Exclusive Catalogue
@@ -66,17 +84,15 @@ export default function CollectionsPage() {
           <div className="w-16 h-[1px] bg-[#d4a24c]/40 mx-auto"></div>
         </div>
 
-        {/* Dynamic Cards Grid */}
         {sarees.length === 0 ? (
-          <p className="text-center text-white/40">No items available in the catalog right now.</p>
+          <p className="text-center text-white/40">No items visible in the catalogue frame.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {sarees.map((saree) => (
               <div 
-                key={saree.id}
+                key={saree.id.toString()}
                 className="group rounded-2xl overflow-hidden border border-[#d4a24c]/10 bg-white/[0.01] transition duration-500 hover:border-[#d4a24c]/30 flex flex-col"
               >
-                {/* 1. WRAPPED IMAGE SECTION WITH LINK TO DYNAMIC PRODUCT PAGE */}
                 <Link href={`/product/${saree.id}`} className="cursor-pointer">
                   <div className="aspect-[3/4] overflow-hidden bg-neutral-900 relative">
                     <img 
@@ -90,16 +106,13 @@ export default function CollectionsPage() {
                   </div>
                 </Link>
 
-                {/* Details Section */}
                 <div className="p-6 flex flex-col flex-1 justify-between">
                   <div>
-                    {/* 2. WRAPPED TITLE WITH LINK TO DYNAMIC PRODUCT PAGE */}
                     <Link href={`/product/${saree.id}`} className="cursor-pointer">
                       <h3 className="text-lg font-serif font-medium text-white mb-2 group-hover:text-[#d4a24c] transition duration-300">
                         {saree.name}
                       </h3>
                     </Link>
-                    
                     <p className="text-[#d4a24c] font-bold text-base mb-6">
                       ₹{saree.price.toLocaleString('en-IN')}
                     </p>
@@ -107,7 +120,7 @@ export default function CollectionsPage() {
 
                   <button
                     onClick={() => addItem({
-                      id: saree.id,
+                      id: saree.id.toString(),
                       name: saree.name,
                       price: saree.price,
                       image: saree.image,
