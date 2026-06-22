@@ -1,57 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-interface CartItem {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
+import { useCartStore } from '@/store/cartStore';
 
 export default function CartPage() {
-  // Mocking items already in the shopping cart using dynamic React state
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 'kanjeevaram-pure-01',
-      name: 'Bridal Crimson Kanjeevaram Silk',
-      category: 'Pure Kanjeevaram',
-      price: 24500,
-      image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=300&auto=format&fit=crop',
-      quantity: 1
-    },
-    {
-      id: 'banarasi-brocade-02',
-      name: 'Royal Zari Banarasi Silk',
-      category: 'Banarasi Brocade',
-      price: 18900,
-      image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=300&auto=format&fit=crop',
-      quantity: 1
-    }
-  ]);
+  // Pull live data and control functions directly from our global Zustand store
+  const { items, updateQuantity, removeItem, getSubtotal } = useCartStore();
+  
+  // Next.js hydration safety flag to prevent layout mismatches on load
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  const updateQuantity = (id: string, delta: number) => {
-    setCartItems(prev =>
-      prev.map(item => {
-        if (item.id === id) {
-          const newQty = item.quantity + delta;
-          return newQty > 0 ? { ...item, quantity: newQty } : item;
-        }
-        return item;
-      })
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-[#160205] flex items-center justify-center text-white/50 text-sm tracking-widest uppercase">
+        Loading Luxury Selection...
+      </div>
     );
-  };
+  }
 
-  const removeItem = (id: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  // Live total summary calculations
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const shipping = subtotal > 0 ? 0 : 0; // Free luxury insured shipping configured
+  const subtotal = getSubtotal();
+  const shipping = subtotal > 0 ? 0 : 0; // Complimentary luxury shipping configuration
   const total = subtotal + shipping;
 
   return (
@@ -66,7 +39,7 @@ export default function CartPage() {
         `
       }}
     >
-      {/* Texture Layer */}
+      {/* Texture Overlay Layer */}
       <div 
         className="absolute inset-0 opacity-[0.015] pointer-events-none mix-blend-overlay"
         style={{
@@ -74,12 +47,8 @@ export default function CartPage() {
         }}
       />
 
-      {/* Decorative Blur Ambient Depth Blobs */}
-      <div className="absolute top-[25%] left-[-10%] w-[45%] aspect-square rounded-full bg-[#3b0a12]/20 blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[15%] right-[-10%] w-[40%] aspect-square rounded-full bg-[#6e0e1a]/15 blur-[150px] pointer-events-none" />
-
       <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Header Section */}
+        {/* Header Block */}
         <div className="text-center mb-12">
           <span className="text-[#d4a24c] text-xs font-semibold tracking-widest uppercase bg-[#d4a24c]/10 px-4 py-1.5 rounded-full border border-[#d4a24c]/20">
             Your Selection
@@ -90,7 +59,7 @@ export default function CartPage() {
           <div className="w-12 h-[1px] bg-[#d4a24c]/40 mx-auto"></div>
         </div>
 
-        {cartItems.length === 0 ? (
+        {items.length === 0 ? (
           <div 
             className="rounded-[28px] p-12 text-center border border-[#d4a24c]/10 bg-white/[0.01]"
             style={{ backdropFilter: 'blur(35px)', WebkitBackdropFilter: 'blur(35px)' }}
@@ -103,9 +72,9 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             
-            {/* Left Column: Cart Items List */}
+            {/* Left Column: Live Cart Items List */}
             <div className="lg:col-span-8 flex flex-col gap-4">
-              {cartItems.map((item) => (
+              {items.map((item) => (
                 <div 
                   key={item.id}
                   className="rounded-2xl p-4 md:p-6 border border-[#d4a24c]/10 bg-white/[0.01] flex items-center gap-6"
@@ -126,37 +95,36 @@ export default function CartPage() {
                       ₹{item.price.toLocaleString('en-IN')}
                     </p>
 
-                    {/* Mobile Quantity Control (Visible on small screens) */}
+                    {/* Mobile Controls */}
                     <div className="flex items-center gap-3 mt-3 sm:hidden">
-                      <button onClick={() => updateQuantity(item.id, -1)} className="w-7 h-7 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/5 active:scale-95 text-xs">-</button>
+                      <button onClick={() => updateQuantity(item.id, -1)} className="w-7 h-7 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/5 text-xs">-</button>
                       <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, 1)} className="w-7 h-7 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/5 active:scale-95 text-xs">+</button>
+                      <button onClick={() => updateQuantity(item.id, 1)} className="w-7 h-7 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/5 text-xs">+</button>
                     </div>
                   </div>
 
-                  {/* Desktop Quantity Controls & Delete Box */}
+                  {/* Desktop Controls */}
                   <div className="hidden sm:flex items-center gap-4 shrink-0">
                     <div className="flex items-center border border-white/10 rounded-xl bg-black/20 p-1">
-                      <button onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 active:scale-95 font-medium">-</button>
+                      <button onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 font-medium">-</button>
                       <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 active:scale-95 font-medium">+</button>
+                      <button onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/5 font-medium">+</button>
                     </div>
 
                     <button 
                       onClick={() => removeItem(item.id)}
-                      className="p-3 rounded-xl border border-red-500/10 text-red-400 hover:bg-red-500/10 active:scale-95 transition text-xs font-semibold uppercase tracking-wider"
+                      className="p-3 rounded-xl border border-red-500/10 text-red-400 hover:bg-red-500/10 transition text-xs font-semibold uppercase tracking-wider"
                     >
                       Remove
                     </button>
                   </div>
 
-                  {/* Simple close button for mobile view layout */}
                   <button onClick={() => removeItem(item.id)} className="sm:hidden text-white/30 hover:text-red-400 p-2 text-lg self-start">×</button>
                 </div>
               ))}
             </div>
 
-            {/* Right Column: Order Pricing Summary Balance */}
+            {/* Right Column: Live Calculations Display Box */}
             <div 
               className="lg:col-span-4 rounded-[24px] p-6 md:p-8 border border-[#d4a24c]/10 bg-white/[0.01]"
               style={{
