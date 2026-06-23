@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { supabase } from '../../../lib/supabase'; // Make sure path matches your lib location
+import { supabase } from '@/lib/supabase';
 import { useCartStore } from '@/store/cartStore';
 
 interface Saree {
@@ -14,42 +14,51 @@ interface Saree {
 }
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+  const params = useParams();
   const router = useRouter();
+
   const [saree, setSaree] = useState<Saree | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
-    if (!id) return;
-
-    async function fetchProduct() {
+    const fetchProduct = async () => {
       try {
-        setLoading(true);
-        // Query only the single saree matching this specific ID
+        const productId = params.id as string;
+
+        if (!productId) {
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
           .from('sarees')
           .select('*')
-          .eq('id', id)
+          .eq('id', productId)
           .single();
 
-        if (error) throw error;
-        setSaree(data);
+        if (error) {
+          console.error(error);
+          setSaree(null);
+        } else {
+          setSaree(data);
+        }
       } catch (err) {
-        console.error('Error fetching product details:', err);
+        console.error(err);
+        setSaree(null);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchProduct();
-  }, [id]);
+  }, [params.id]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#160205] flex items-center justify-center text-white/50 text-sm tracking-widest uppercase">
-        Bringing Up Masterpiece Details...
+      <div className="min-h-screen bg-[#160205] flex items-center justify-center text-white">
+        Loading Product...
       </div>
     );
   }
@@ -57,63 +66,73 @@ export default function ProductDetailPage() {
   if (!saree) {
     return (
       <div className="min-h-screen bg-[#160205] flex flex-col items-center justify-center text-white gap-4">
-        <p className="text-white/60">Heirloom item not found.</p>
-        <button onClick={() => router.push('/collections')} className="text-[#d4a24c] text-sm underline">
-          Return to Collections
+        <p>Product not found</p>
+
+        <button
+          onClick={() => router.push('/collections')}
+          className="bg-[#d4a24c] text-black px-6 py-3 rounded-xl"
+        >
+          Back to Collections
         </button>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#160205] pt-36 pb-24 px-6 md:px-12 text-white">
+    <main className="min-h-screen bg-[#160205] text-white pt-40 pb-24 px-6 md:px-12">
       <div className="max-w-6xl mx-auto">
-        {/* Back Button */}
-        <button 
+
+        <button
           onClick={() => router.push('/collections')}
-          className="text-white/60 hover:text-[#d4a24c] text-xs uppercase tracking-widest mb-12 flex items-center gap-2 transition"
+          className="mb-10 text-[#d4a24c] text-sm"
         >
-          ← Back to Catalog
+          ← Back to Collections
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-          {/* Left: Product Image */}
-          <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-neutral-950 border border-[#d4a24c]/10">
-            <img src={saree.image} alt={saree.name} className="w-full h-full object-cover" />
+        <div className="grid md:grid-cols-2 gap-12">
+
+          <div className="rounded-2xl overflow-hidden border border-[#d4a24c]/20">
+            <img
+              src={saree.image}
+              alt={saree.name}
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          {/* Right: Product Details */}
           <div className="flex flex-col justify-center">
-            <span className="text-[#d4a24c] text-xs font-semibold tracking-widest uppercase bg-[#d4a24c]/10 px-4 py-1.5 rounded-full border border-[#d4a24c]/20 self-start mb-6">
+
+            <span className="text-[#d4a24c] uppercase tracking-widest text-xs mb-4">
               {saree.category}
             </span>
-            
-            <h1 className="text-3xl md:text-5xl font-serif font-bold mb-4 tracking-wide">
+
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
               {saree.name}
             </h1>
-            
-            <p className="text-2xl font-bold text-[#d4a24c] mb-8">
+
+            <p className="text-3xl text-[#d4a24c] font-bold mb-8">
               ₹{saree.price.toLocaleString('en-IN')}
             </p>
 
-            <div className="w-full h-[1px] bg-[#d4a24c]/20 mb-8"></div>
-
-            <p className="text-white/70 text-sm leading-relaxed mb-10 font-light">
-              Experience sheer heritage luxury with this masterfully curated saree. Exquisitely handcrafted with royal threads, premium textile density, and timeless weaving motifs tailored for majestic occasions.
+            <p className="text-white/70 mb-10 leading-relaxed">
+              Experience timeless elegance with this handcrafted luxury saree,
+              designed for weddings, celebrations and special occasions.
             </p>
 
             <button
-              onClick={() => addItem({
-                id: saree.id,
-                name: saree.name,
-                price: saree.price,
-                image: saree.image,
-                category: saree.category
-              })}
-              className="w-full md:w-auto md:px-12 bg-[#d4a24c] text-black font-semibold py-4 rounded-xl hover:bg-[#c29340] transition duration-300 text-xs uppercase tracking-widest"
+              onClick={() =>
+                addItem({
+                  id: saree.id,
+                  name: saree.name,
+                  category: saree.category,
+                  price: saree.price,
+                  image: saree.image,
+                })
+              }
+              className="bg-[#d4a24c] text-black px-8 py-4 rounded-xl font-semibold hover:scale-105 transition"
             >
-              Add to Selection
+              Add to Cart
             </button>
+
           </div>
         </div>
       </div>
