@@ -1,5 +1,5 @@
 'use client';
-
+import Image from 'next/image';
 import React from 'react';
 import Link from 'next/link';
 
@@ -24,7 +24,7 @@ export default function HomePage() {
 
   return (
     <main 
-      className="relative min-h-screen text-white pt-40 pb-24 px-6 md:px-12 overflow-hidden flex flex-col items-center"
+      className="relative min-h-screen text-white pt-40 pb-24 px-4 md:px-12 overflow-hidden flex flex-col items-center"
       style={{
         backgroundColor: '#160205',
         backgroundImage: `
@@ -45,49 +45,95 @@ export default function HomePage() {
       {/* Decorative Ambient Depth Blobs */}
       <div className="absolute top-[10%] left-[10%] w-[45%] aspect-square rounded-full bg-[#3b0a12]/30 blur-[140px] pointer-events-none fixed" />
       <div className="absolute bottom-[10%] right-[10%] w-[40%] aspect-square rounded-full bg-[#6e0e1a]/20 blur-[150px] pointer-events-none fixed" />
+      {/* ================= LUXURY LOGO OPENING SECTION ================= */}
+
+<section className="relative min-h-screen flex flex-col items-center justify-center text-center w-full">
+
+  <div className="absolute w-[900px] h-[900px] bg-[#d4a24c]/10 blur-[200px] rounded-full" />
+
+  <div className="relative z-10">
+
+    <div className="relative w-[90vw] max-w-[800px] h-[35vh] md:h-[55vh] mx-auto">
+      <Image
+        src="/logo.png"
+        alt="Arunaa Aalayam"
+        fill
+        priority
+        className="object-contain"
+      />
+    </div>
+
+    <h1 className="mt-6 text-2xl md:text-6xl font-serif text-[#d4a24c] tracking-[4px] md:tracking-[10px]">
+      ARUNAA AALAYAM
+    </h1>
+
+    <p className="mt-4 text-white/60 uppercase tracking-[6px] text-sm md:text-base">
+      Luxury Silk Sarees
+    </p>
+
+    <div className="mt-12 flex flex-col items-center">
+      <div className="w-[1px] h-16 bg-gradient-to-b from-[#d4a24c]/60 to-transparent"></div>
+
+      <p className="mt-4 text-white/40 text-xs tracking-[4px] uppercase animate-bounce">
+        Scroll To Explore
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
 
       {/* ================= HERO SECTION ================= */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 mt-8 md:mt-12 mb-32">
-        
-        {/* Left Side: Typography & Call to Actions */}
-        <div className="flex-1 text-center lg:text-left">
-          <span className="inline-block text-[#d4a24c] text-xs font-semibold tracking-widest uppercase bg-[#d4a24c]/10 px-4 py-1.5 rounded-full border border-[#d4a24c]/20 mb-6 shadow-lg shadow-[#d4a24c]/5">
-            Welcome to Arunaa Aalayam
-          </span>
-          
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-white leading-tight mb-6 tracking-wide drop-shadow-2xl">
-            Pure Luxury,<br />
-            <span className="text-[#d4a24c] italic pr-2">Woven in Silk.</span>
-          </h1>
-          
-          <p className="text-white/70 text-base md:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-10 font-light">
-            Discover authentic handloom Kanjeevaram and Banarasi masterpieces. Directly sourced from traditional artisans, delivered with grace in every fold.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5">
-            <Link 
-              href="/collections" 
-              className="w-full sm:w-auto bg-[#d4a24c] text-black px-10 py-4 rounded-full font-semibold hover:scale-105 transition duration-300 text-sm uppercase tracking-widest shadow-[0_0_40px_rgba(212,162,76,0.3)]"
-            >
-              Explore Collections
-            </Link>
-            <Link 
-              href="/about" 
-              className="w-full sm:w-auto border border-white/20 text-white px-10 py-4 rounded-full font-semibold hover:bg-white/10 transition duration-300 text-sm uppercase tracking-widest backdrop-blur-md"
-            >
-              Our Heritage
-            </Link>
-          </div>
+<div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 mb-32">
 
-          <div className="mt-12 flex flex-wrap justify-center lg:justify-start gap-6 md:gap-8 text-xs text-white/50 uppercase tracking-widest font-semibold">
-            <div className="flex items-center gap-2">
-              <span className="text-[#d4a24c] text-base">✦</span> Silk Mark Certified
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[#d4a24c] text-base">✦</span> Premium Packaging
-            </div>
-          </div>
-        </div>
+  {/* Left Side: Typography & Call to Actions */}
+  <div className="flex-1 text-center lg:text-left">
+    <span className="inline-block text-[#d4a24c] text-xs font-semibold tracking-widest uppercase bg-[#d4a24c]/10 px-4 py-1.5 rounded-full border border-[#d4a24c]/20 mb-6 shadow-lg shadow-[#d4a24c]/5">
+      Welcome to Arunaa Aalayam
+    </span>
+
+    <h1 className="text-3xl md:text-6xl lg:text-7xl font-serif font-bold text-white leading-tight mb-6 tracking-wide drop-shadow-2xl">
+      Pure Luxury,
+      <br />
+      <span className="text-[#d4a24c] italic pr-2">
+        Woven in Silk.
+      </span>
+    </h1>
+
+    <p className="text-white/70 text-base md:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-10 font-light">
+      Discover authentic handloom Kanjeevaram and Banarasi masterpieces.
+      Directly sourced from traditional artisans, delivered with grace in every fold.
+    </p>
+
+    <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5">
+      <Link
+        href="/collections"
+        className="w-full sm:w-auto bg-[#d4a24c] text-black px-10 py-4 rounded-full font-semibold hover:scale-105 transition duration-300 text-sm uppercase tracking-widest shadow-[0_0_40px_rgba(212,162,76,0.3)]"
+      >
+        Explore Collections
+      </Link>
+
+      <Link
+        href="/about"
+        className="w-full sm:w-auto border border-white/20 text-white px-10 py-4 rounded-full font-semibold hover:bg-white/10 transition duration-300 text-sm uppercase tracking-widest backdrop-blur-md"
+      >
+        Our Heritage
+      </Link>
+    </div>
+
+    <div className="mt-12 flex flex-wrap justify-center lg:justify-start gap-6 md:gap-8 text-xs text-white/50 uppercase tracking-widest font-semibold">
+      <div className="flex items-center gap-2">
+        <span className="text-[#d4a24c] text-base">✦</span>
+        Silk Mark Certified
+      </div>
+
+      <div className="flex items-center gap-2">
+        <span className="text-[#d4a24c] text-base">✦</span>
+        Premium Packaging
+      </div>
+    </div>
+  </div>
 
         {/* Right Side: Showcase Glassmorphic Image Card */}
         <div className="flex-1 w-full max-w-lg lg:max-w-none relative group">
@@ -117,10 +163,11 @@ export default function HomePage() {
             </div>
           </div>
           <div className="absolute inset-0 bg-[#d4a24c]/10 blur-[100px] rounded-full -z-10 transition-opacity duration-700 group-hover:opacity-100 opacity-60"></div>
-        </div>
-      </div>
+</div>
 
-      {/* ================= SCROLL DIVIDER ================= */}
+</div>
+
+{/* ================= SCROLL DIVIDER ================= */}
       <div className="relative z-10 w-full flex justify-center mb-32">
         <div className="h-32 w-[1px] bg-gradient-to-b from-[#d4a24c]/0 via-[#d4a24c]/40 to-[#d4a24c]/0"></div>
       </div>

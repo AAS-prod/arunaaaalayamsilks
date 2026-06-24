@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from './components/layout/Navbar'; 
+import SplashScreen from "./components/layout/SplashScreen";
 // 👇 Updated this path to match your folder structure perfectly!
 import Footer from './components/home/Footer'; 
 import './globals.css';
